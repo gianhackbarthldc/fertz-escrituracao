@@ -1,0 +1,9 @@
+@echo off
+echo 🚀 Iniciando Automacao SAP - EDOC_COCKPIT...
+echo.
+echo 📋 Verificando dependencias...
+pip install -r requirements.txt --quiet
+echo.
+echo 🌐 Abrindo interface Streamlit...
+echo.
+python -m streamlit run main.py
