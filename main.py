@@ -1116,7 +1116,7 @@ def main():
                                                             df_vtin['_chave_temp'] = df_vtin[coluna_chave_vtin].apply(padronizar_chave)
                                                             
                                                             # Selecionar colunas para merge
-                                                            colunas_vtin = ['_chave_temp', 'Número da nota']
+                                                            colunas_vtin = ['_chave_temp', 'Número da nota', 'Data escrituração']
                                                             if coluna_doc_vtin:
                                                                 colunas_vtin.append(coluna_doc_vtin)
                                                             
@@ -1127,23 +1127,17 @@ def main():
                                                                 on='_chave_temp', 
                                                                 how='left'
                                                             )
-                                                            
-                                                            # Filtrar apenas notas não emitidas (DEPOIS do merge)
-                                                            if coluna_doc_vtin in df_final.columns:
-                                                                registros_antes = len(df_final)
-                                                                df_final = df_final[
-                                                                    df_final[coluna_doc_vtin].astype(str).str.len().fillna(0) < 2
-                                                                ]
-                                                                registros_removidos = registros_antes - len(df_final)
-                                                                st.info(f"🔍 Filtro aplicado: {registros_removidos} nota(s) já emitida(s) removida(s) | {len(df_final)} nota(s) pendente(s)")
-                                                            
+
                                                             # Remover coluna temporária
                                                             df_final = df_final.drop(columns=['_chave_temp'])
                                                             
                                                             # Salvar DataFrame final
                                                             progress_bar.progress(100, text="Concluído!")
                                                             final_excel_path = os.path.join(reports_dir_zbr, "dados_final_completo.xlsx")
-                                                            df_final = df_final[['Data de emissão da NF-e', 'Número da nota', 'Série de dados', 'Chave NF', 'Nome Fornecedor', 'CNPJ Emissor', 'CNPJ Destinatário', 'CFOP', 'Valor Total NF', 'Peso Líquido']]
+                                                            df_final = df_final[['Data de emissão da NF-e', 'Data escrituração', 'Número da nota', 'Série de dados', 'Chave NF', 'Nome Fornecedor', 'CNPJ Emissor', 'CNPJ Destinatário', 'CFOP', 'Valor Total NF', 'Peso Líquido', 'Nº documento']]
+                                                            for col in ['Data de emissão da NF-e', 'Data escrituração']:
+                                                                if col in df_final.columns:
+                                                                    df_final[col] = pd.to_datetime(df_final[col], errors='coerce').dt.strftime('%d/%m/%Y')
                                                             df_final.to_excel(final_excel_path, index=False)
                                                             
                                                             # Exibir apenas a tabela final
